@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,7 +36,7 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     @JsonManagedReference
-    private List<Prestamo> prestamos;
+    private List<Prestamo> prestamos = new ArrayList<>();
 
     public Usuario(){}
 
@@ -46,9 +47,10 @@ public class Usuario {
         this.tipo=tipo;
     }
 
-    public Usuario(String dni, String nombre, String password, String tipo, LocalDate penalizacionHasta){
+    public Usuario(String dni, String nombre, String email, String password, String tipo, LocalDate penalizacionHasta){
         this.dni=dni;
         this.nombre=nombre;
+        this.email=email;
         this.password=password;
         this.tipo=tipo;
         this.penalizacionHasta=penalizacionHasta;
@@ -106,18 +108,23 @@ public class Usuario {
         return penalizacionHasta;
     }
 
-    public int getPrestamosActivos(){
-        int contador=0;
+    public int getPrestamosActivos() {
+        int contador = 0;
         LocalDate fecha_actual = LocalDate.now();
-        for(int i=0;i<this.prestamos.size();i++){
-            if(prestamos.get(i).getFechaDevolucion().isAfter(fecha_actual)){
+
+        for (Prestamo prestamo : this.prestamos) {
+            if (prestamo.getFechaDevolucion() != null && prestamo.getFechaDevolucion().isAfter(fecha_actual)) {
                 contador++;
             }
         }
         return contador;
     }
 
+
     public void setPenalizacionHasta(LocalDate penalizacionHasta) {
+        if (penalizacionHasta == null) {
+            return;
+        }
         this.penalizacionHasta = penalizacionHasta;
     }
 
@@ -146,4 +153,6 @@ public class Usuario {
                 ", prestamos=" + prestamos +
                 "\n}";
     }
+
+
 }

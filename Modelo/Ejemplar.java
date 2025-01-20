@@ -35,8 +35,9 @@ public class Ejemplar {
 
     public Ejemplar(){}
 
-    public Ejemplar(Libro libro, String estado) {
-        this.libro = libro;
+    public Ejemplar(String isbn, String estado) {
+        this.libro = new Libro();
+        this.libro.setIsbn(isbn);
         this.estado = estado;
     }
 

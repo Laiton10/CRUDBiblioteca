@@ -1,9 +1,6 @@
 package org.example.demo1.crudBiblioteca.Modelo;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -36,7 +33,7 @@ public class DAOGenerico<T> {
     }
 
     //UPDATE
-    public T update( T objeto){
+    public T update(T objeto){
         tx.begin();
         em.merge(objeto);
         tx.commit();
@@ -51,12 +48,41 @@ public class DAOGenerico<T> {
         return false;
     }
 
+    public boolean deletebyId(int id){
+        tx.begin();
+        em.remove(em.find(clase, id));
+        tx.commit();
+        return false;
+    }
+
     //DELETE
     public boolean delete(T objeto){
         tx.begin();
         em.remove(objeto);
         tx.commit();
         return false;
+    }
+
+    public String buscarPorNombreContra(String nombre, String password){
+        tx.begin();
+        //Usuario usuario = em.find(Usuario.class, nombre);
+        String sql = "SELECT * FROM Usuario WHERE nombre = ?";
+        Query consulta = em.createNativeQuery(sql, Usuario.class);
+        consulta.setParameter(1, nombre);
+
+        Usuario usuario = (Usuario) consulta.getSingleResult();
+
+        String mensaje = "";
+
+        if(usuario == null){
+             mensaje = "No se encontró el usuario";
+        }else{
+            if(password.equals(usuario.getPassword())){
+                mensaje = "Usuario encontrado";
+            }
+        }
+        tx.commit();
+        return mensaje;
     }
 
     @Override

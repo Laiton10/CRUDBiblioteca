@@ -24,48 +24,37 @@ public class LibrosServlet extends HttpServlet {
     }
     //INSERT, select by isbn, delete, actualizar
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
+        PrintWriter impresora = response.getWriter();
+        ObjectMapper conversorJson = new ObjectMapper();
+        conversorJson.registerModule(new JavaTimeModule());
+
         String titulo = request.getParameter("titulo");
         String autor = request.getParameter("autor");
         String isbn = request.getParameter("isbn");
         String operacion = request.getParameter("operacion");
 
-        response.setContentType("application/html");
-        PrintWriter out = response.getWriter();
+        if ("insert".equals(operacion)) {
+                Libro libro = new Libro(isbn, titulo, autor);
+                daolibro.add(libro);
+                String jsonResponse = conversorJson.writeValueAsString(libro);
+                impresora.println(jsonResponse);
 
+        } else if ("update".equals(operacion)) {
+                Libro libro = new Libro(isbn, titulo, autor);
+                daolibro.update(libro);
+                String jsonResponse = conversorJson.writeValueAsString(libro);
+                impresora.println(jsonResponse);
 
+        } else if ("deleteBy".equals(operacion)) {
+                daolibro.deletebyId(isbn);
+                String jsonResponse = conversorJson.writeValueAsString("Libro borrado por ISBN: " + isbn);
+                impresora.println(jsonResponse);
 
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<body>");
-        System.out.println(operacion);
-
-
-        if(operacion.equals("insert")){
-            Libro libro = new Libro(isbn, titulo, autor);
-            daolibro.add(libro);
-            out.println("El libro creado es: " + libro.toString());
-
-        }else if(operacion.equals("update")){
-            Libro libro = new Libro(isbn, titulo, autor);
-            daolibro.update(libro);
-            out.println("El libro actualizado es: " + libro.toString());
-
-        }else if(operacion.equals("delete")){
-            Libro libro = new Libro(isbn, titulo, autor);
-            daolibro.delete(libro);
-            out.println("El libro borrado es: " + libro.toString());
-
-        }else if(operacion.equals("deleteBy")){
-            Libro libro = new Libro(isbn, titulo, autor);
-            daolibro.deletebyId(isbn);
-            out.println("El libro borrado por isbn es: " + libro.toString());
         }
-        out.println("</body>");
-        out.println("</html>");
     }
 
-    //SELECTALL
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 

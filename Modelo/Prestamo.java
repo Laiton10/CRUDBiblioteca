@@ -72,6 +72,7 @@ public class Prestamo {
 
     public void setFechaInicio(LocalDate fechaInicio) {
         this.fechaInicio = fechaInicio;
+        this.fechaDevolucion = fechaInicio.plusDays(15);
     }
 
     public LocalDate getFechaDevolucion() {
